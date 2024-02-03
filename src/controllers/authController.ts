@@ -25,7 +25,7 @@ export const signUp = catchAsync(
       name: user.name,
       image: user.image,
     });
-    res.status(200).json({
+    res.status(201).json({
       status: "success",
       user,
       token,
@@ -64,7 +64,7 @@ export const signIn = catchAsync(
   }
 );
 
-exports.protect = catchAsync(
+export const protect = catchAsync(
   async (req: reqInterface, res: Response, next: NextFunction) => {
     // Getting token and check of it's there.
     let token: string | undefined = undefined;

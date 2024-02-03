@@ -9,6 +9,7 @@ import { conect } from "./utils/DBConnection";
 import AppError from "./utils/appError";
 import globalErrorHandler from "./controllers/errorController";
 import userRoutes from './routers/userRoutes'
+import articleRoutes from './routers/articleRoutes'
 
 app.use(express.json());
 
@@ -32,7 +33,7 @@ xss('<script>alert("xss");</script>');
 
 // global routes
 app.use('/api/auth',userRoutes);
-
+app.use('/api/article',articleRoutes )
 
 app.all("*", (req: any, res: any, next: any) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server`,404))
