@@ -1,21 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import catchAsync from "../utils/catchAsync";
 import Article from "../models/articleModel";
+import AppError from "../utils/appError";
+import mongoose from "mongoose";
 
 export const createArticle = catchAsync(
   async (req: any, res: Response, next: NextFunction) => {
     let { title, body, tags } = req.body;
     if (!title) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Please Enter the title of your blog",
-      });
+      return next(new AppError("Please Enter the title of your blog", 400));
     }
     if (!body) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Please Enter the body of your blog",
-      });
+      return next(new AppError("Please Enter the body of your blog", 400));
     }
     if (tags) tags = JSON.parse(tags);
     const article = await Article.create({
@@ -23,6 +19,7 @@ export const createArticle = catchAsync(
       body,
       image: req.file?.path,
       tags,
+      user: req.user,
     });
     res.status(201).json({
       status: "success",
@@ -47,6 +44,9 @@ export const lastestArticles = catchAsync(
 export const getArticleById = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await Article.findById(req.params.id);
+    if (!result) {
+      return next(new AppError("There is no such Blog", 400));
+    }
     res.status(200).json({
       status: "success",
       result,
@@ -55,8 +55,16 @@ export const getArticleById = catchAsync(
 );
 
 export const deleteArticle = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const result = await Article.findByIdAndDelete(req.params.id);
+  async (req: any, res: Response, next: NextFunction) => {
+    let result: any = await Article.findById(req.params.id).populate("user");
+    if (!result) return next(new AppError("There is no such Blog", 400));
+    if (
+      !new mongoose.Types.ObjectId(result.user._id).equals(
+        new mongoose.Types.ObjectId(req.user._id)
+      )
+    )
+      return next(new AppError("You are not authorized", 401));
+    await Article.findByIdAndDelete(req.params.id);
     res.status(200).json({
       status: "success",
       result: "Blog Deleted successfully",

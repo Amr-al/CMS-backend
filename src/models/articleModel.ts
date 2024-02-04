@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import User from "./userModel";
 
 const articleModel = new mongoose.Schema(
   {
@@ -18,6 +19,7 @@ const articleModel = new mongoose.Schema(
         type: String,
       },
     ],
+    user:{type: mongoose.Schema.Types.ObjectId, ref: User}
   },
   { timestamps: true }
 );

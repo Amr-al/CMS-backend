@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createArticle,
+  deleteArticle,
   editArticle,
   getArticleById,
   lastestArticles,
@@ -13,4 +14,5 @@ router.post("/create", protect, upload.single("image"), createArticle);
 router.get("/lastest", lastestArticles);
 router.get("/:id", getArticleById);
 router.patch('/:id', protect, upload.single("image"), editArticle )
+router.delete('/:id', protect, deleteArticle)
 export default router;
