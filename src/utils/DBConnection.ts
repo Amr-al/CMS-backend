@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 export const conect = async () => {
   try {
+  
     mongoose
       .connect(process.env.DB_URL!, {})
       .then(() => {
