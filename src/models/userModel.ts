@@ -1,5 +1,7 @@
 import { NextFunction } from "express";
 import bcrypt from "bcrypt";
+import {isEmail} from "validator";
+
 import mongoose from "mongoose";
 interface User {
   name: string;
@@ -19,8 +21,14 @@ const userModel = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "please provide your email"],
-      unique:true,
+      unique: true,
       maxLength: 40,
+      validate: {
+        validator: function (el: string) {
+          return isEmail(el);
+        },
+        message: "Email is Invailed",
+      },
     },
     password: {
       type: String,

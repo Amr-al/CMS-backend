@@ -32,12 +32,14 @@ export const createArticle = catchAsync(
 export const lastestArticles = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     let page: any = req.query.page ? req.query.page : 1;
+    const numberOfDocs = await Article.countDocuments();
     const result = await Article.find()
       .skip((parseInt(page) - 1) * 9)
       .limit(9);
     res.status(200).json({
       status: "success",
       result,
+      numberOfDocs,
     });
   }
 );
@@ -140,6 +142,49 @@ export const editComment = catchAsync(
     res.status(200).json({
       status: "success",
       result,
+    });
+  }
+);
+
+export const addReact = catchAsync(
+  async (req: any, res: Response, next: NextFunction) => {
+    const { id } = req.body;
+    if (!id || !mongoose.Types.ObjectId.isValid(id))
+      return next(new AppError("Invalid ID", 400));
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { $addToSet: { reacts: req.user._id } },
+      { new: true }
+    );
+    if (!comment) {
+      return next(new AppError("This comment is not found", 400));
+    }
+    res.status(200).json({
+      status: "success",
+      comment,
+    });
+  }
+);
+
+export const deleteReact = catchAsync(
+  async (req: any, res: Response, next: NextFunction) => {
+    const { id } = req.body;
+    if (!id || !mongoose.Types.ObjectId.isValid(id))
+      return next(new AppError("Invalid ID", 400));
+
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      {
+        $pull: { reacts: req.user._id },
+      },
+      { new: true }
+    );
+    if (!comment) {
+      return next(new AppError("This comment is not found", 400));
+    }
+    res.status(200).json({
+      status: "success",
+      comment,
     });
   }
 );

@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {
   addComment,
+  addReact,
   createArticle,
   deleteArticle,
+  deleteReact,
   editArticle,
   editComment,
   getArticleById,
@@ -16,7 +18,9 @@ router.post("/create", protect, upload.single("image"), createArticle);
 router.get("/lastest", lastestArticles);
 router.get("/:id", getArticleById);
 router.patch("/:id", protect, upload.single("image"), editArticle);
-router.delete("/:id", protect, deleteArticle);
 router.post("/comment", protect, addComment);
 router.put("/comment", protect, editComment);
+router.post('/react', protect , addReact);
+router.delete('/react', protect, deleteReact)
+router.delete("/:id", protect, deleteArticle);
 export default router;
